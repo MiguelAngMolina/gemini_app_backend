@@ -6,9 +6,14 @@ import { basicPrompUseCase } from './use-cases/basic_prompt.use-case';
 
 @Injectable()
 export class GeminiService {
-
     private ai = new GoogleGenAI({ apiKey: process.env.GEMINI_APPI_KEY });
+
     async basicPrompt(basicPromptDto: BasicPromptDto) {
         return basicPrompUseCase(this.ai, basicPromptDto)
+    }
+
+    async basicPromptStream(basicPromptDto: BasicPromptDto) {
+        // return basicPrompUseCase(this.ai, basicPromptDto)
+        return 'Hola cracks desde Stream'
     }
 }
