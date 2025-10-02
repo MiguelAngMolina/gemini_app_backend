@@ -62,11 +62,18 @@ export class GeminiController {
     chatPromptDto.files = files ?? [];
 
     const stream = await this.geminiService.chatStream(chatPromptDto);
-
     const data = await this.outputStreamResponse(res, stream);
 
-    console.log({data});
+    const geminiMessage ={
+      role: 'model',
+      parts: [{text: data}]
+    };
+    const userMessage ={
+      role: 'user',
+      parts: [{text: chatPromptDto.prompt}]
+    };
 
-    
+    this.geminiService.saveMessage(chatPromptDto.chatId, userMessage);    
+    this.geminiService.saveMessage(chatPromptDto.chatId, geminiMessage);    
   }
 }
