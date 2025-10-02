@@ -1,5 +1,6 @@
 import { createPartFromUri, GoogleGenAI } from "@google/genai";
 import { ChatPromptDto } from "../dtos/chat-prompt.dto";
+import {geminiUploadFiles } from "../helpers/gemini-upload-file";
 
 
 interface Options{
@@ -12,18 +13,7 @@ export const chatPrompStreamUseCase = async (
     options?: Options,
     ) => {
         const {prompt, files = [] } = chatPromptDto;
-        //TODO: Refactorizar
-        const images = await Promise.all(
-            files.map( (file) => {
-                const image = ai.files.upload({
-                file: new Blob([new Uint8Array(file.buffer)], {
-                    type: file.mimetype.includes('image') ? file.mimetype : 'image/jpg'
-                }),
-            });
-            return image;
-            }
-
-        ));
+        const images = await geminiUploadFiles(ai, files);
 
         const {
             model = "gemini-2.5-flash",
