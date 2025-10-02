@@ -3,10 +3,30 @@ import express from 'express';
 import { GeminiService } from './gemini.service';
 import { BasicPromptDto } from './dtos/basic-prompt.dto';
 import {FilesInterceptor } from '@nestjs/platform-express';
+import { ChatPromptDto } from './dtos/chat-prompt.dto';
+import { GenerateContentResponse } from '@google/genai';
 
 @Controller('gemini')
 export class GeminiController {
   constructor(private readonly geminiService: GeminiService) {}
+
+
+  async outputStreamResponse(
+    res: express.Response, 
+    stream: AsyncGenerator<GenerateContentResponse, any, any>){
+    // res.setHeader('Content-type', 'application/json');
+    res.setHeader('Content-type', 'text/plain');
+    res.status(HttpStatus.OK);
+
+    let resultText = '';
+    for await (const chunk of stream){
+      const piece = chunk.text;
+      resultText+= piece;
+      res.write(piece);
+    }
+    res.end();
+    return resultText
+    }
 
 
   @Post('basic-prompt')
@@ -21,22 +41,32 @@ export class GeminiController {
     @Body() basicPromptDto:BasicPromptDto,
     @Res() res: express.Response,
     @UploadedFiles() files: Array<Express.Multer.File>
-    //TODO FILES
   ){
     
     basicPromptDto.files = files ?? [];
 
     const stream = await this.geminiService.basicPromptStream(basicPromptDto);
+    void this.outputStreamResponse(res,stream);
+  }
 
-    // res.setHeader('Content-type', 'application/json');
-    res.setHeader('Content-type', 'text/plain');
-    res.status(HttpStatus.OK);
 
-    for await (const chunk of stream){
-      const piece = chunk.text;
-      console.log(piece)
-      res.write(piece);
-    }
-    res.end();
+
+  @Post('chat-stream')
+  @UseInterceptors(FilesInterceptor('files'))
+   async chatStream(
+    @Body() chatPromptDto: ChatPromptDto,
+    @Res() res: express.Response,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ){
+    
+    chatPromptDto.files = files ?? [];
+
+    const stream = await this.geminiService.basicPromptStream(chatPromptDto);
+
+    const data = await this.outputStreamResponse(res, stream);
+
+    console.log({data});
+
+    
   }
 }
