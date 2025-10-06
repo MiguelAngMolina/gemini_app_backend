@@ -7,6 +7,8 @@ import { ChatPromptDto } from './dtos/chat-prompt.dto';
 import { chatPrompStreamUseCase } from './use-cases/chat-prompt-stream.use-case';
 import { ImageGenerationDto } from './dtos/image-generation.dto';
 import { imageGenerationUseCase } from './use-cases/image-generation.use-case';
+import { PokemonHelperDto } from './dtos/pokemon-game.dto';
+import { getPokemonHelpUseCase } from './use-cases/pokemon-helper.use-case';
 
 
 @Injectable()
@@ -49,5 +51,9 @@ export class GeminiService {
     imageGeneration(imageGenerationDto: ImageGenerationDto){
         return imageGenerationUseCase(this.ai, imageGenerationDto)
 
+    }
+
+    getPokemonHelp(pokemonHelperDto: PokemonHelperDto){
+        return getPokemonHelpUseCase(this.ai, pokemonHelperDto)
     }
 }
