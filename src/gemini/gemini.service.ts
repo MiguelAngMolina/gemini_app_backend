@@ -9,6 +9,8 @@ import { ImageGenerationDto } from './dtos/image-generation.dto';
 import { imageGenerationUseCase } from './use-cases/image-generation.use-case';
 import { PokemonHelperDto } from './dtos/pokemon-game.dto';
 import { getPokemonHelpUseCase } from './use-cases/pokemon-helper.use-case';
+import { TriviaQuestionDto } from './dtos/trivia-question.dto';
+import { getTriviaQuestionUseCase } from './use-cases/get-trivia.use-case';
 
 
 @Injectable()
@@ -55,5 +57,9 @@ export class GeminiService {
 
     getPokemonHelp(pokemonHelperDto: PokemonHelperDto){
         return getPokemonHelpUseCase(this.ai, pokemonHelperDto)
+    }
+
+    getTriviaQuestion(triviaQuestionDto: TriviaQuestionDto){
+        return getTriviaQuestionUseCase(this.ai, triviaQuestionDto)
     }
 }
